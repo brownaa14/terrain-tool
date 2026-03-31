@@ -25,10 +25,40 @@ export default function TerrainPage() {
     setParams(prev => ({ ...prev, ...updated }))
   }
 
-  //placeholder STL generation
-  function handleGenerate() {
+  async function handleGenerate() {
+    if (!bbox) return
     setIsGenerating(true)
-    console.log('Generating STL with:', { bbox, params })
+
+    try {
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          bbox,
+          zScale: params.zScale,
+          baseThickness: params.baseThickness,
+          resolution: params.resolution,
+          printWidth: params.printWidth,
+          printDepth: params.printDepth,
+        })
+      })
+
+      if (!response.ok) throw new Error('Generation failed')
+
+      // Trigger a file download from the streamed response
+      const blob = await response.blob()
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'terrain.stl'
+      a.click()
+      URL.revokeObjectURL(url)
+
+    } catch (err) {
+      console.error('STL generation failed:', err)
+    } finally {
+      setIsGenerating(false)
+    }
   }
   return (
     <div className='flex flex-col h-screen overflow-hidden bg-white'>
