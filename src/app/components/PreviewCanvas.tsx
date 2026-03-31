@@ -1,3 +1,7 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+
 import { BBox, TerrainParams } from '@/types/terrain'
 
 type PreviewCanvasProps = {

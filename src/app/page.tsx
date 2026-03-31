@@ -19,6 +19,7 @@ export default function TerrainPage() {
   const [regionInfo, setRegionInfo] = useState<RegionInfo | null>(null)
   const [params, setParams] = useState<TerrainParams>(DEFAULT_PARAMS)
   const [isGenerating, setIsGenerating] = useState(false)
+  const [isDrawing, setIsDrawing] = useState(false)
 
   function handleParamsChange(updated: Partial<TerrainParams>) {
     setParams(prev => ({ ...prev, ...updated }))
