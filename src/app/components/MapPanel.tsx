@@ -7,9 +7,10 @@ import { BBox } from '@/types/terrain'
 
 type MapPanelProps = {
     onBboxChange: (bbox: BBox) => void
+    bbox: BBox | null
 }
 
-export default function MapPanel({ onBboxChange }: MapPanelProps) {
+export default function MapPanel({ onBboxChange, bbox }: MapPanelProps) {
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maplibregl.Map | null>(null)
 
@@ -22,6 +23,42 @@ export default function MapPanel({ onBboxChange }: MapPanelProps) {
     useEffect(() => {
         isDrawModeRef.current = isDrawMode
     }, [isDrawMode])
+
+    useEffect(() => {
+        if (!map.current) return
+
+        const source = map.current.getSource('bbox') as maplibregl.GeoJSONSource
+
+        if (!source) return
+
+        if (!bbox) {
+            source.setData({
+                type: 'Feature',
+                geometry: { type: 'Polygon', coordinates: [[]] },
+                properties: {}
+            })
+            return
+        }
+
+        const coords = [
+            [bbox.west, bbox.north],
+            [bbox.east, bbox.north],
+            [bbox.east, bbox.south],
+            [bbox.west, bbox.south],
+            [bbox.west, bbox.north]
+        ]
+
+        source.setData({
+            type: 'Feature',
+            geometry: { type: 'Polygon', coordinates: [coords] },
+            properties: {}
+        })
+
+        map.current.fitBounds(
+            [[bbox.west, bbox.south], [bbox.east, bbox.north]],
+            { padding: 80, duration: 1000 }
+        )
+    })
 
     useEffect(() => {
         if (!mapContainer.current || map.current) return
@@ -58,6 +95,7 @@ export default function MapPanel({ onBboxChange }: MapPanelProps) {
                     'line-width': 1.5
                 }
             })
+
 
             // mousedown, mousemove, mouseup are all registered at the same level
             // never nest event listeners inside each other

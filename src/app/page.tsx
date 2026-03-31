@@ -50,7 +50,10 @@ export default function TerrainPage() {
 
       <div className='flex flex-1 overflow-hidden'>
         <main className='flex-1 relative'>
-          <MapPanel onBboxChange={setBbox} />
+          <MapPanel
+            onBboxChange={setBbox}
+            bbox={bbox}
+          />
         </main>
 
         <aside className='w-80 flex flex-col border-1 border-gray-400 overflow-hidden'>
@@ -60,6 +63,7 @@ export default function TerrainPage() {
             onParamsChange={handleParamsChange}
             onGenerate={handleGenerate}
             isGenerating={isGenerating}
+            onBboxChange={setBbox}
           />
         </aside>
       </div>
