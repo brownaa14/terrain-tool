@@ -64,15 +64,8 @@ export default function TerrainPage() {
   return (
     <div className='flex flex-col h-screen overflow-hidden bg-white'>
       <header className='h-12 flex items-center px-4 gap-3 border-b border-gray-400 shrink-0'>
-        <button className='flex items-center gap-2 text-sm px-3 py-1.5 border border-gray-200 rounded-md hover:bg-gray-50'>
-          {/* rectangle icon */}
-          <svg width='12' height='12' viewBox="0 0 12 12" fill='none'>
-            <rect x='1' y='1' width='10' rx='1' stroke='currentColor' strokeWidth='1.2' />
-          </svg>
-          Draw region
-        </button>
 
-        <span className='text-sm font-medium'>Terrain Tool</span>
+        <span className='text-sm font-medium'>Topo Mesh</span>
 
         <span className='ml-auto text-xs text-gray-400'>
           {bbox ? "adjust your region or configure below" : "Draw a region on the map to begin"}

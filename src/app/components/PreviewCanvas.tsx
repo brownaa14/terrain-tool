@@ -184,7 +184,7 @@ export default function PreviewCanvas({ bbox, params }: PreviewCanvasProps) {
             0.01,
             100
         )
-        camera.position.set(0, 0.8, 1.2)
+        camera.position.set(0, 2, 1.2)
         camera.lookAt(0, 0, 0)
         cameraRef.current = camera
 
@@ -275,7 +275,7 @@ export default function PreviewCanvas({ bbox, params }: PreviewCanvasProps) {
     }, [bbox])
 
     return (
-        <div className="w-full h-48 border-b border-gray-100 relative bg-stone-100">
+        <div className="w-full h-72 border-b border-gray-100 relative bg-stone-100">
             <canvas
                 ref={canvasRef}
                 className="w-full h-full"
