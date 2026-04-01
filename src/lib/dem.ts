@@ -16,7 +16,7 @@ export async function fetchElevationGrid(
     resolution: number
 ): Promise<ElevationGrid> {
 
-    const apiKey = process.env.OPENTOPOGROPHY_API_KEY ?? 'defaultkey'
+    const apiKey = process.env.OPENTOPOGRAPHY_API_KEY ?? 'defaultkey'
 
     const params = new URLSearchParams({
         demtype: 'SRTMGL1',

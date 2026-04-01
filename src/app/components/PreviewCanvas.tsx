@@ -240,12 +240,14 @@ export default function PreviewCanvas({ bbox, params }: PreviewCanvasProps) {
     useEffect(() => {
         if (!meshRef.current) return
 
-        const grid = generateFakeGrid(40, 40)
+        // Use real grid if we have one, otherwise fake
+        const grid = lastGridRef.current ?? generateFakeGrid(40, 40)
         const newGeometry = buildGeometry(grid, params.zScale, params.baseThickness)
         meshRef.current.geometry.dispose()
         meshRef.current.geometry = newGeometry
     }, [params.zScale, params.baseThickness])
 
+    const lastGridRef = useRef<number[][] | null>(null)
     // Fetch real elevation data whenever the bbox changes
     useEffect(() => {
         if (!bbox || !meshRef.current) return
@@ -262,6 +264,8 @@ export default function PreviewCanvas({ bbox, params }: PreviewCanvasProps) {
             try {
                 const res = await fetch(`/api/dem?${params_url}`)
                 const data = await res.json()
+                console.log('DEM response:', data)
+                lastGridRef.current = data.grid
 
                 const newGeometry = buildGeometry(data.grid, params.zScale, params.baseThickness)
                 meshRef.current!.geometry.dispose()
