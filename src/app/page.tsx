@@ -20,6 +20,7 @@ export default function TerrainPage() {
   const [params, setParams] = useState<TerrainParams>(DEFAULT_PARAMS)
   const [isGenerating, setIsGenerating] = useState(false)
   const [isDrawing, setIsDrawing] = useState(false)
+  const [presetBbox, setPresetBbox] = useState<BBox | null>(null)
 
   function handleParamsChange(updated: Partial<TerrainParams>) {
     setParams(prev => ({ ...prev, ...updated }))
@@ -83,6 +84,7 @@ export default function TerrainPage() {
           <MapPanel
             onBboxChange={setBbox}
             bbox={bbox}
+            presetBbox={presetBbox}
           />
         </main>
 
@@ -94,6 +96,7 @@ export default function TerrainPage() {
             onGenerate={handleGenerate}
             isGenerating={isGenerating}
             onBboxChange={setBbox}
+            onPresetSelect={setPresetBbox}
           />
         </aside>
       </div>

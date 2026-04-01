@@ -8,6 +8,7 @@ type ConfigPanelProps = {
     onGenerate: () => void
     isGenerating: boolean
     onBboxChange: (bbox: BBox) => void
+    onPresetSelect: (bbox: BBox) => void
 }
 
 export default function ConfigPanel({
@@ -15,7 +16,8 @@ export default function ConfigPanel({
     onParamsChange,
     onGenerate,
     isGenerating,
-    onBboxChange
+    onBboxChange,
+    onPresetSelect
 }: ConfigPanelProps) {
 
     // When print width changes, if aspect ratio is locked
@@ -187,7 +189,10 @@ export default function ConfigPanel({
                             key={preset.name}
                             // onParamsChange only updates params, we need a separate
                             // prop to update bbox — we'll wire this up next
-                            onClick={() => onBboxChange(preset.bbox)}
+                            onClick={() => {
+                                onBboxChange(preset.bbox)
+                                onPresetSelect(preset.bbox)
+                            }}
                             className="text-xs px-2.5 py-1 border border-gray-200 rounded-md hover:bg-gray-50 text-gray-600"
                         >
                             {preset.name}

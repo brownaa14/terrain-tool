@@ -8,9 +8,10 @@ import { BBox } from '@/types/terrain'
 type MapPanelProps = {
     onBboxChange: (bbox: BBox) => void
     bbox: BBox | null
+    presetBbox: BBox | null
 }
 
-export default function MapPanel({ onBboxChange, bbox }: MapPanelProps) {
+export default function MapPanel({ onBboxChange, bbox, presetBbox }: MapPanelProps) {
     const mapContainer = useRef<HTMLDivElement>(null)
     const map = useRef<maplibregl.Map | null>(null)
 
@@ -26,9 +27,7 @@ export default function MapPanel({ onBboxChange, bbox }: MapPanelProps) {
 
     useEffect(() => {
         if (!map.current) return
-
         const source = map.current.getSource('bbox') as maplibregl.GeoJSONSource
-
         if (!source) return
 
         if (!bbox) {
@@ -45,7 +44,7 @@ export default function MapPanel({ onBboxChange, bbox }: MapPanelProps) {
             [bbox.east, bbox.north],
             [bbox.east, bbox.south],
             [bbox.west, bbox.south],
-            [bbox.west, bbox.north]
+            [bbox.west, bbox.north],
         ]
 
         source.setData({
@@ -53,12 +52,17 @@ export default function MapPanel({ onBboxChange, bbox }: MapPanelProps) {
             geometry: { type: 'Polygon', coordinates: [coords] },
             properties: {}
         })
+    }, [bbox])
+
+    // Only zooms when a preset is selected
+    useEffect(() => {
+        if (!map.current || !presetBbox) return
 
         map.current.fitBounds(
-            [[bbox.west, bbox.south], [bbox.east, bbox.north]],
+            [[presetBbox.west, presetBbox.south], [presetBbox.east, presetBbox.north]],
             { padding: 80, duration: 1000 }
         )
-    })
+    }, [presetBbox])
 
     useEffect(() => {
         if (!mapContainer.current || map.current) return
