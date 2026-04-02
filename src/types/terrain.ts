@@ -3,13 +3,13 @@ export type BBox = {
     east: number
     south: number
     west: number
-}
+};
 
 export type RegionInfo = {
     areaKm2: number
     elevMin: number
     elevMax: number
-}
+};
 
 export type TerrainParams = {
     zScale: number
@@ -18,4 +18,4 @@ export type TerrainParams = {
     printWidth: number
     printDepth: number
     aspectRatioLocked: boolean
-}
+};

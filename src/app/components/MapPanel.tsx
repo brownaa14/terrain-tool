@@ -1,42 +1,42 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import maplibregl from 'maplibre-gl'
-import 'maplibre-gl/dist/maplibre-gl.css'
-import { BBox } from '@/types/terrain'
+import { useEffect, useRef, useState } from 'react';
+import maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import { BBox } from '@/types/terrain';
 
 type MapPanelProps = {
     onBboxChange: (bbox: BBox) => void
     bbox: BBox | null
     presetBbox: BBox | null
-}
+};
 
 export default function MapPanel({ onBboxChange, bbox, presetBbox }: MapPanelProps) {
-    const mapContainer = useRef<HTMLDivElement>(null)
-    const map = useRef<maplibregl.Map | null>(null)
+    const mapContainer = useRef<HTMLDivElement>(null);
+    const map = useRef<maplibregl.Map | null>(null);
 
-    const [isDrawMode, setIsDrawMode] = useState(false)
-    const isDrawModeRef = useRef(false)
+    const [isDrawMode, setIsDrawMode] = useState(false);
+    const isDrawModeRef = useRef(false);
 
-    const isDrawing = useRef(false)
-    const startPoint = useRef<[number, number] | null>(null)
+    const isDrawing = useRef(false);
+    const startPoint = useRef<[number, number] | null>(null);
 
     useEffect(() => {
         isDrawModeRef.current = isDrawMode
-    }, [isDrawMode])
+    }, [isDrawMode]);
 
     useEffect(() => {
-        if (!map.current) return
-        const source = map.current.getSource('bbox') as maplibregl.GeoJSONSource
-        if (!source) return
+        if (!map.current) return;
+        const source = map.current.getSource('bbox') as maplibregl.GeoJSONSource;
+        if (!source) return;
 
         if (!bbox) {
             source.setData({
                 type: 'Feature',
                 geometry: { type: 'Polygon', coordinates: [[]] },
                 properties: {}
-            })
-            return
+            });
+            return;
         }
 
         const coords = [
@@ -45,40 +45,40 @@ export default function MapPanel({ onBboxChange, bbox, presetBbox }: MapPanelPro
             [bbox.east, bbox.south],
             [bbox.west, bbox.south],
             [bbox.west, bbox.north],
-        ]
+        ];
 
         source.setData({
             type: 'Feature',
             geometry: { type: 'Polygon', coordinates: [coords] },
             properties: {}
-        })
-    }, [bbox])
+        });
+    }, [bbox]);
 
     // Only zooms when a preset is selected
     useEffect(() => {
-        if (!map.current || !presetBbox) return
+        if (!map.current || !presetBbox) return;
 
         map.current.fitBounds(
             [[presetBbox.west, presetBbox.south], [presetBbox.east, presetBbox.north]],
             { padding: 80, duration: 1000 }
-        )
-    }, [presetBbox])
+        );
+    }, [presetBbox]);
 
     useEffect(() => {
-        if (!mapContainer.current || map.current) return
+        if (!mapContainer.current || map.current) return;
 
         map.current = new maplibregl.Map({
             container: mapContainer.current,
             style: 'https://tiles.openfreemap.org/styles/bright',
             center: [0, 20],
             zoom: 2,
-        })
+        });
 
         map.current.on('load', () => {
             map.current!.addSource('bbox', {
                 type: 'geojson',
                 data: { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[]] }, properties: {} }
-            })
+            });
 
             map.current!.addLayer({
                 id: 'bbox-fill',
@@ -88,7 +88,7 @@ export default function MapPanel({ onBboxChange, bbox, presetBbox }: MapPanelPro
                     'fill-color': '#2d6a4f',
                     'fill-opacity': 0.08
                 }
-            })
+            });
 
             map.current!.addLayer({
                 id: 'bbox-outline',
@@ -98,24 +98,21 @@ export default function MapPanel({ onBboxChange, bbox, presetBbox }: MapPanelPro
                     'line-color': '#2d6a4f',
                     'line-width': 1.5
                 }
-            })
+            });
 
-
-            // mousedown, mousemove, mouseup are all registered at the same level
-            // never nest event listeners inside each other
             map.current!.on('mousedown', (e) => {
-                if (!isDrawModeRef.current) return
-                isDrawing.current = true
-                startPoint.current = [e.lngLat.lng, e.lngLat.lat]
-                map.current!.dragPan.disable()
-            })
+                if (!isDrawModeRef.current) return;
+                isDrawing.current = true;
+                startPoint.current = [e.lngLat.lng, e.lngLat.lat];
+                map.current!.dragPan.disable();
+            });
 
             map.current!.on('mousemove', (e) => {
-                if (!isDrawing.current || !startPoint.current) return
+                if (!isDrawing.current || !startPoint.current) return;
 
-                const [startLng, startLat] = startPoint.current
-                const endLng = e.lngLat.lng
-                const endLat = e.lngLat.lat
+                const [startLng, startLat] = startPoint.current;
+                const endLng = e.lngLat.lng;
+                const endLat = e.lngLat.lat;
 
                 const coords = [
                     [startLng, startLat],
@@ -123,41 +120,41 @@ export default function MapPanel({ onBboxChange, bbox, presetBbox }: MapPanelPro
                     [endLng, endLat],
                     [startLng, endLat],
                     [startLng, startLat],
-                ]
+                ];
 
-                const source = map.current!.getSource('bbox') as maplibregl.GeoJSONSource
+                const source = map.current!.getSource('bbox') as maplibregl.GeoJSONSource;
                 source.setData({
                     type: 'Feature',
                     geometry: { type: 'Polygon', coordinates: [coords] },
                     properties: {}
-                })
-            })
+                });
+            });
 
             map.current!.on('mouseup', (e) => {
-                if (!isDrawing.current || !startPoint.current) return
+                if (!isDrawing.current || !startPoint.current) return;
 
-                isDrawing.current = false
-                map.current!.dragPan.enable()
+                isDrawing.current = false;
+                map.current!.dragPan.enable();
 
-                const [startLng, startLat] = startPoint.current
+                const [startLng, startLat] = startPoint.current;
 
                 onBboxChange({
                     west: Math.min(startLng, e.lngLat.lng),
                     east: Math.max(startLng, e.lngLat.lng),
                     south: Math.min(startLat, e.lngLat.lat),
                     north: Math.max(startLat, e.lngLat.lat)
-                })
+                });
 
-                startPoint.current = null
-                setIsDrawMode(false)
+                startPoint.current = null;
+                setIsDrawMode(false);
             })
-        })
+        });
 
         return () => {
             map.current?.remove()
             map.current = null
-        }
-    }, [])
+        };
+    }, []);
 
     return (
         <div className="w-full h-full relative">
@@ -176,5 +173,5 @@ export default function MapPanel({ onBboxChange, bbox, presetBbox }: MapPanelPro
                 {isDrawMode ? 'Drawing...' : 'Draw region'}
             </button>
         </div>
-    )
-}
+    );
+};

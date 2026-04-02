@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { BBox, TerrainParams, RegionInfo } from '@/types/terrain'
-import MapPanel from './components/MapPanel'
-import ConfigPanel from './components/ConfigPanel'
-import PreviewCanvas from './components/PreviewCanvas'
+import { useState } from 'react';
+import { BBox, TerrainParams, RegionInfo } from '@/types/terrain';
+import MapPanel from './components/MapPanel';
+import ConfigPanel from './components/ConfigPanel';
+import PreviewCanvas from './components/PreviewCanvas';
 
 const DEFAULT_PARAMS: TerrainParams = {
   zScale: 2.0,
@@ -13,22 +13,23 @@ const DEFAULT_PARAMS: TerrainParams = {
   printWidth: 150,
   printDepth: 112,
   aspectRatioLocked: true,
-}
+};
+
 export default function TerrainPage() {
-  const [bbox, setBbox] = useState<BBox | null>(null)
-  const [regionInfo, setRegionInfo] = useState<RegionInfo | null>(null)
-  const [params, setParams] = useState<TerrainParams>(DEFAULT_PARAMS)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [isDrawing, setIsDrawing] = useState(false)
-  const [presetBbox, setPresetBbox] = useState<BBox | null>(null)
+  const [bbox, setBbox] = useState<BBox | null>(null);
+  const [regionInfo, setRegionInfo] = useState<RegionInfo | null>(null);
+  const [params, setParams] = useState<TerrainParams>(DEFAULT_PARAMS);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const [presetBbox, setPresetBbox] = useState<BBox | null>(null);
 
   function handleParamsChange(updated: Partial<TerrainParams>) {
-    setParams(prev => ({ ...prev, ...updated }))
-  }
+    setParams(prev => ({ ...prev, ...updated }));
+  };
 
   async function handleGenerate() {
-    if (!bbox) return
-    setIsGenerating(true)
+    if (!bbox) return;
+    setIsGenerating(true);
 
     try {
       const response = await fetch('/api/generate', {
@@ -42,25 +43,24 @@ export default function TerrainPage() {
           printWidth: params.printWidth,
           printDepth: params.printDepth,
         })
-      })
+      });
 
-      if (!response.ok) throw new Error('Generation failed')
+      if (!response.ok) throw new Error('Generation failed');
 
-      // Trigger a file download from the streamed response
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'terrain.stl'
-      a.click()
-      URL.revokeObjectURL(url)
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'terrain.stl';
+      a.click();
+      URL.revokeObjectURL(url);
 
     } catch (err) {
-      console.error('STL generation failed:', err)
+      console.error('STL generation failed:', err);
     } finally {
-      setIsGenerating(false)
-    }
-  }
+      setIsGenerating(false);
+    };
+  };
   return (
     <div className='flex flex-col h-screen overflow-hidden bg-white'>
       <header className='h-12 flex items-center px-4 gap-3 border-b border-gray-400 shrink-0'>
@@ -94,5 +94,5 @@ export default function TerrainPage() {
         </aside>
       </div>
     </div>
-  )
-}
+  );
+};
