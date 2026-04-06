@@ -20,11 +20,19 @@ export default function TerrainPage() {
   const [regionInfo, setRegionInfo] = useState<RegionInfo | null>(null);
   const [params, setParams] = useState<TerrainParams>(DEFAULT_PARAMS);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isDrawing, setIsDrawing] = useState(false);
+  const [isDrawMode, setIsDrawMode] = useState(false);
   const [presetBbox, setPresetBbox] = useState<BBox | null>(null);
 
   function handleParamsChange(updated: Partial<TerrainParams>) {
     setParams(prev => ({ ...prev, ...updated }));
+  };
+
+  //toast notifications
+  const [toast, setToast] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+  function showToast(message: string, type: 'success' | 'error') {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 5000);
   };
 
   async function handleGenerate() {
@@ -55,8 +63,11 @@ export default function TerrainPage() {
       a.click();
       URL.revokeObjectURL(url);
 
+      showToast('STL downloaded successfully', 'success');
+
     } catch (err) {
       console.error('STL generation failed:', err);
+      showToast('Generation failed, try a smaller region or lower resolution', 'error');
     } finally {
       setIsGenerating(false);
     };
@@ -78,6 +89,9 @@ export default function TerrainPage() {
             onBboxChange={setBbox}
             bbox={bbox}
             presetBbox={presetBbox}
+            isDrawMode={isDrawMode}
+            onDrawModeChange={setIsDrawMode}
+            onSizeError={(msg) => showToast(msg, 'error')}
           />
         </main>
 
@@ -92,7 +106,15 @@ export default function TerrainPage() {
             onPresetSelect={setPresetBbox}
           />
         </aside>
+
+        {toast && (
+          <div
+            className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-2.5 rounded-md text-sm text-white shadow-lg transition-all ${toast.type === 'error' ? 'bg-red-600' : 'bg-gray-900'
+              }`}
+          >
+          </div>
+        )}
       </div>
-    </div>
+    </div >
   );
 };
